@@ -1,137 +1,201 @@
-@import "tailwindcss";
+/* Minimal overrides on top of live Enfold/Avia CSS */
 
-:root {
-  --primary: #109bc5;
-  --primary-dark: #034661;
-  --primary-mid: #0f81a1;
-  --accent: #df653e;
-  --black: #222222;
-  --muted: #555555;
-  --soft: #f5fafc;
-  --white: #ffffff;
-  --background: #ffffff;
-  --foreground: #222222;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-mid: var(--primary-mid);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-soft: var(--soft);
-  --font-sans: var(--font-manrope);
-  --font-display: var(--font-sora);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+html,
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-manrope), "Manrope", sans-serif;
-  line-height: 1.65;
+  padding: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Sticky header: live site hides upper meta on scroll */
+#wrap_all {
+  overflow: visible;
 }
 
-img {
-  max-width: 100%;
+html.header-scrolled #header_meta,
+body.header-scrolled #header_meta,
+#header.header-scrolled #header_meta,
+#header.av_header_sticky_active #header_meta {
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* Shrinking header when scrolled — match live */
+html.header-scrolled.html_large #header_main .container,
+html.header-scrolled.html_large.html_main_nav_header .main_menu ul:first-child > li a {
+  height: 80px !important;
+  line-height: 80px !important;
+}
+
+html.header-scrolled #header_main .logo img,
+#header.header-scrolled .logo img {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  max-height: 64px;
+  width: auto;
+}
+
+/* Keep hero slides clipped (prevents multi-slide bleed) */
+.mainslider.slick-initialized,
+.mainslider .slick-list {
+  overflow: hidden !important;
+}
+
+.mainslider .slick-slide video {
+  display: block !important;
+  width: 100%;
   height: auto;
+}
+
+.mainslider .slick-arrow {
+  z-index: 5;
+}
+
+/* Desktop nav ≥990px / burger below — match live Enfold */
+@media (min-width: 990px) {
+  #top #header .av-main-nav {
+    display: flex !important;
+    align-items: center;
+  }
+
+  #top #header .av-main-nav > li.menu-item {
+    display: block !important;
+  }
+
+  #top #header .av-burger-menu-main {
+    display: none !important;
+  }
+
+  .sr-nav-drawer,
+  .sr-nav-backdrop {
+    display: none !important;
+  }
+}
+
+@media (max-width: 989px) {
+  #top #header .av-main-nav > li.menu-item:not(.av-burger-menu-main) {
+    display: none !important;
+  }
+
+  #top #header .av-burger-menu-main {
+    display: block !important;
+  }
+}
+
+/* Mobile drawer */
+.sr-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sr-nav-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(320px, 88vw);
+  height: 100%;
+  background: #111;
+  color: #fff;
+  z-index: 100001;
+  padding: 24px 20px 40px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+html.av-burger-overlay-active .sr-nav-backdrop,
+body.av-burger-overlay-active .sr-nav-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html.av-burger-overlay-active .sr-nav-drawer,
+body.av-burger-overlay-active .sr-nav-drawer {
+  transform: translateX(0);
+}
+
+.sr-nav-drawer-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 12px;
+}
+
+.sr-nav-drawer a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 16px;
+}
+
+.sr-nav-parent {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sr-nav-sub {
+  display: none;
+  padding-left: 12px;
+}
+
+.sr-nav-sub.open {
   display: block;
 }
 
-.container-site {
-  width: min(1180px, calc(100% - 2rem));
-  margin-inline: auto;
+.sr-nav-sub a {
+  font-size: 14px;
+  opacity: 0.85;
 }
 
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--primary);
-  color: #fff;
-  border-radius: 4px;
-  padding: 0.85rem 1.4rem;
-  font-weight: 700;
-  transition: background 0.2s ease, transform 0.2s ease;
+/* Hero videos */
+.mainslider .slideritem video {
+  display: block !important;
+  width: 100%;
+  height: auto;
+  margin-bottom: -14px;
 }
 
-.btn-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-1px);
+/* Ensure header bar is opaque white like live */
+#top #header,
+#top #header_main,
+#top #header .header_bg {
+  background-color: #ffffff;
 }
 
-.btn-accent {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 4px;
-  padding: 0.85rem 1.4rem;
-  font-weight: 700;
-  transition: background 0.2s ease, transform 0.2s ease;
+#top #header_main {
+  background: #ffffff;
 }
 
-.btn-accent:hover {
-  background: #c65230;
-  transform: translateY(-1px);
+/* Services dropdown — match Enfold hover */
+#top #header .av-main-nav > li:hover > ul.sub-menu,
+#top #header .av-main-nav > li.dropdown_ul_available:hover > ul.sub-menu {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1000;
 }
 
-.section-title {
-  font-family: var(--font-sora), "Sora", sans-serif;
-  font-size: clamp(1.7rem, 3vw, 2.5rem);
-  font-weight: 700;
-  color: var(--primary-dark);
-  margin: 0 0 0.75rem;
+#top #header .av-main-nav > li > ul.sub-menu {
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
 }
 
-.section-kicker {
-  color: var(--primary);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.82rem;
-  margin-bottom: 0.4rem;
-}
-
-.page-banner {
-  position: relative;
-  min-height: 260px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  color: #fff;
-  background-size: cover;
-  background-position: center;
-}
-
-.page-banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, rgba(3, 70, 97, 0.88), rgba(16, 155, 197, 0.55));
-}
-
-.page-banner > * {
-  position: relative;
-  z-index: 1;
-}
-
-.card-shadow {
-  box-shadow: 0 12px 30px rgba(3, 70, 97, 0.08);
+#top #header .av-main-nav > li > ul.sub-menu a {
+  color: #333 !important;
+  font-size: 14px;
 }

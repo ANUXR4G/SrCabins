@@ -1,0 +1,28 @@
+/*
+Theme Name: SR Cabins
+Description: A Child Theme for the Enfold Wordpress Theme. If you plan to do a lot of file modifications we recommend to use this Theme instead of the original Theme. Updating wil be much easier then.
+Version: 1.0
+Author: Kriesi
+Author URI: http://www.kriesi.at
+Template: enfold
+
+*/
+
+/*Add your own styles here:*/
+#header_meta {
+	min-height: 45px;
+}
+.phone-info {
+    line-height: 34px;
+    color: #fff !important;
+}
+#top #wrap_all .social_bookmarks a {
+    line-height: 44px;
+    color: #ffffff;
+}
+#top .social_bookmarks {
+	height: 44px;
+}
+div#header_main {
+    border-bottom: 1px solid #cbed99;
+}

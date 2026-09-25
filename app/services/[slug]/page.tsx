@@ -1,78 +1,79 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageBanner } from "@/components/ServiceCard";
-import { ContactForm } from "@/components/ContactForm";
-import { getService, services } from "@/lib/site-data";
+import { LivePage } from "@/components/LivePageGate";
 
-type Props = { params: Promise<{ slug: string }> };
+const SLUGS = [
+  "portable-cabins",
+  "accommodation-cabins",
+  "security-cabins",
+  "portable-bunk-houses",
+  "toilet-and-urinal-cabins",
+  "cargo-shipping-container",
+  "container-shops-cafes",
+  "farm-house-cabins",
+  "portable-shop-and-storage-cabins",
+  "portable-bunk-house",
+] as const;
+
+type Slug = (typeof SLUGS)[number];
+
+function isSlug(s: string): s is Slug {
+  return (SLUGS as readonly string[]).includes(s);
+}
+
+async function loadService(slug: Slug) {
+  switch (slug) {
+    case "portable-cabins":
+      return import("@/lib/live-html/service-portable-cabins");
+    case "accommodation-cabins":
+      return import("@/lib/live-html/service-accommodation-cabins");
+    case "security-cabins":
+      return import("@/lib/live-html/service-security-cabins");
+    case "portable-bunk-houses":
+      return import("@/lib/live-html/service-portable-bunk-houses");
+    case "toilet-and-urinal-cabins":
+      return import("@/lib/live-html/service-toilet-and-urinal-cabins");
+    case "cargo-shipping-container":
+      return import("@/lib/live-html/service-cargo-shipping-container");
+    case "container-shops-cafes":
+      return import("@/lib/live-html/service-container-shops-cafes");
+    case "farm-house-cabins":
+      return import("@/lib/live-html/service-farm-house-cabins");
+    case "portable-shop-and-storage-cabins":
+      return import("@/lib/live-html/service-portable-shop-and-storage-cabins");
+    case "portable-bunk-house":
+      return import("@/lib/live-html/service-portable-bunk-house");
+  }
+}
 
 export function generateStaticParams() {
-  return services.map((s) => ({ slug: s.slug }));
+  return SLUGS.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const service = getService(slug);
-  return service
-    ? { title: service.title, description: service.excerpt }
-    : {};
+  if (!isSlug(slug)) return { title: "Not found" };
+  const mod = await loadService(slug);
+  return { title: mod.title };
 }
 
-export default async function ServiceDetailPage({ params }: Props) {
+export default async function ServiceDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
-  const service = getService(slug);
-  if (!service) notFound();
-
+  if (!isSlug(slug)) notFound();
+  const mod = await loadService(slug);
+  if (!mod.mainHtml) notFound();
   return (
-    <>
-      <PageBanner title={service.title} image={service.image} />
-      <section className="py-16 md:py-20">
-        <div className="container-site grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <div className="mb-8 overflow-hidden rounded-2xl">
-              <Image
-                src={service.image}
-                alt={service.title}
-                width={1000}
-                height={700}
-                className="w-full object-cover"
-              />
-            </div>
-            <h2 className="section-title">{service.title}</h2>
-            {service.body.map((paragraph) => (
-              <p key={paragraph.slice(0, 40)} className="mb-4 text-muted">
-                {paragraph}
-              </p>
-            ))}
-            <Link href="/contact" className="btn-accent mt-4 inline-flex">
-              Enquire Now
-            </Link>
-          </div>
-          <aside className="lg:sticky lg:top-28 lg:self-start">
-            <ContactForm />
-            <div className="card-shadow mt-6 rounded-xl bg-soft p-5">
-              <h4 className="mb-3 font-bold text-primary-dark">Other Services</h4>
-              <ul className="space-y-2 text-sm">
-                {services
-                  .filter((s) => s.slug !== service.slug)
-                  .slice(0, 6)
-                  .map((s) => (
-                    <li key={s.slug}>
-                      <Link
-                        href={`/services/${s.slug}`}
-                        className="text-muted hover:text-primary"
-                      >
-                        {s.title}
-                      </Link>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </>
+    <LivePage
+      headerHtml={mod.headerHtml}
+      mainHtml={mod.mainHtml}
+      footerHtml={mod.footerHtml}
+    />
   );
 }
